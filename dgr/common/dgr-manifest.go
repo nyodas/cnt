@@ -82,6 +82,7 @@ type AciManifest struct {
 	Build          BuildDefinition   `json:"build,omitempty" yaml:"build,omitempty"`
 	Aci            AciDefinition     `json:"aci,omitempty" yaml:"aci,omitempty"`
 	Tester         TestManifest      `json:"tester,omitempty" yaml:"tester,omitempty"`
+	Testers        []ACFullname      `json:"testers,omitempty" yaml:"testers,omitempty"`
 }
 
 type TestManifest struct {
@@ -155,7 +156,7 @@ func ProcessManifestTemplate(manifestContent string, data2 interface{}, checkNoV
 	if err != nil {
 		return nil, errs.WithEF(err, fields, "Cannot unmarshall manifest")
 	}
-
+	// app App, hostHeaders map[string]http.Header, insecure InsecureOption, port uint
 	if strings.Contains(manifest.NameAndVersion.Version(), "<no value>") {
 		manifest.NameAndVersion = ACFullname(manifest.NameAndVersion.Name())
 	}

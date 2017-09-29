@@ -73,3 +73,10 @@
   echo "$output" | grep "ok 1 Check value of TEST_VAR"
   [ "$status" -eq 0 ]
 }
+
+@test "pod tester should not pls" {
+  run $DGR_PATH -W pod_test test
+  echo -e "$output"
+  echo "$output" | grep "ok 1 Check value of TEST_VAR"
+  [ "$status" -eq 0 ]
+}

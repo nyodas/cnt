@@ -1,0 +1,4 @@
+---
+name: example.com/aci-test
+testers:
+  - "aci.awired.net/aci-acserver:0.4-blablacar-2"

@@ -5,6 +5,9 @@ import (
 	"os"
 	"strings"
 
+	"os/exec"
+	"syscall"
+
 	underscore "github.com/ahl5esoft/golang-underscore"
 	"github.com/appc/spec/schema/types"
 	"github.com/blablacar/dgr/dgr/common"
@@ -90,15 +93,29 @@ func (aci *Aci) runTestAci(testerHash string, hashAcis []string) error {
 	os.MkdirAll(aci.target+pathTestsResult, 0777)
 
 	defer aci.cleanupTest(testerHash, hashAcis)
-	if err := Home.Rkt.Run([]string{"--set-env=" + common.EnvLogLevel + "=" + logs.GetLevel().String(),
+	testerArgs := []string{"--set-env=" + common.EnvLogLevel + "=" + logs.GetLevel().String(),
 		"--set-env=TESTER=TRUE",
 		"--net=default",
 		"--mds-register=false",
 		"--uuid-file-save=" + aci.target + pathTesterUuid,
 		"--volume=" + mountAcname + ",kind=host,source=" + aci.target + pathTestsResult,
 		testerHash,
-		"--exec", "/test",
-	}); err != nil {
+		"--exec", "/test"}
+	for i := range aci.manifest.Testers {
+		testerArgs = append(testerArgs, aci.manifest.Testers[i].String())
+	}
+	statusCode := 0
+	err := Home.Rkt.Run(testerArgs)
+	if err == nil {
+		return err
+	}
+	errExit, ok := err.(*errs.EntryError).Errs[0].(*exec.ExitError).Sys().(syscall.WaitStatus)
+	if !ok {
+		return errs.WithEF(err, aci.fields, "Run of test aci failed")
+	}
+	statusCode = errExit.ExitStatus()
+	// Don't error on sigKILL sigTERM
+	if statusCode != 15 && statusCode != 9 {
 		return errs.WithEF(err, aci.fields, "Run of test aci failed")
 	}
 	return nil

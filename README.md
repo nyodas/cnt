@@ -337,7 +337,9 @@ Templater provides functions to manipulate data inside the template. Here is the
 | isKind    | isKind               |                                                             |
 | isType    | isType               |                                                            |
 
-It also provide all function defined by [gtf project](https://github.com/leekchan/gtf)
+It also provide all function defined by [gtf project](https://github.com/leekchan/gtf)</br>
+And from the [sprig project](http://masterminds.github.io/sprig/) </br>
+When function are defined by both project, the sprig function is the one that will be used.
 
 *We can add functions on demand*
 
